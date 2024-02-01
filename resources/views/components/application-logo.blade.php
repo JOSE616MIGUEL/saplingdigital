@@ -1,0 +1,1 @@
+<img src="{{ asset('img/sapling-foto.jpg') }}" alt="" class="img-fluid rounded-circle">
