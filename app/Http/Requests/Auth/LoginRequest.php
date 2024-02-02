@@ -41,15 +41,22 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        if (Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            RateLimiter::clear($this->throttleKey());
+    
+            if (Auth::user()->role_as == '1') {
+                redirect('admin/dashboard')->with('status', 'Bienvenido al panel de control');
 
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
+            } else {
+                redirect('/home')->with('status', 'Inicio de sesión con éxito');
+            }
         }
-
-        RateLimiter::clear($this->throttleKey());
+    
+        RateLimiter::hit($this->throttleKey());
+    
+        throw ValidationException::withMessages([
+            'email' => trans('auth.failed'),
+        ]);
     }
 
     /**
